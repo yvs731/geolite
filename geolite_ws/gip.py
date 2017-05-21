@@ -7,6 +7,7 @@ import geoip2.database
 path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(path)
 
+from log import Log
 from debug import Debug
 
 
@@ -26,7 +27,7 @@ class Gip:
         try:               
             self.reader = geoip2.database.Reader(self.db_path)          
         except:
-            Debug.print_exception_info()
+            Log.write(Debug.exception_info())
             
     ############################################################
     
@@ -45,7 +46,7 @@ class Gip:
         try:
             resp = self.reader.city(ip)
         except:
-            Debug.print_exception_info()
+            Log.write(Debug.exception_info())
             return None
         
         if not resp:

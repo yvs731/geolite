@@ -8,11 +8,20 @@ from aiohttp import web
 path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(path)
 
+
 from gip import Gip
+from log import Log
 
 # must be in config file
 db_path = '/root/data/maxmind/GeoLite2-City.mmdb'
 
+################################################
+
+async def variable_handler(request):
+    return web.Response(
+        text="Hello, {}".format(request.match_info['ips']))
+    
+################################################
 
 async def index(request):
     """ processes request and 
@@ -28,10 +37,11 @@ async def index(request):
 
     ip = query['ip']
     
-    rx = r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
-    
+    rx = r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}' 
     if len(re.findall(rx, ip)) == 0:
-        return web.Response(text='wrong ip')
+        msg = 'wrong ip'
+        Log.write(msg)
+        return web.Response(text=msg)
     
     gp = Gip(db_path)
     
