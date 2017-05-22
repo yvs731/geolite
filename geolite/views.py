@@ -2,6 +2,7 @@
 import os
 import json
 import re
+import argparse
 
 from aiohttp import web
 
@@ -9,11 +10,20 @@ path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(path)
 
 
-from gip import Gip
-from log import Log
+from geolite.gip import Gip
+from geolite.log import Log
 
-# must be in config file
-db_path = '/root/data/maxmind/GeoLite2-City.mmdb'
+parser = argparse.ArgumentParser()
+parser.add_argument("--dbpath", action='store', type=str)
+args = parser.parse_args()
+
+if args.dbpath:
+    print('dbpath222 == ', args.dbpath)
+    db_path = args.dbpath
+else:
+    db_path = None
+
+#db_path = '/root/data/maxmind/GeoLite2-City.mmdb'
 
 ################################################
 
@@ -26,6 +36,11 @@ async def variable_handler(request):
 async def index(request):
     """ processes request and 
         output ip info in json format """
+        
+    if db_path is None:
+        msg = 'database path is not initialized. '
+        msg += 'restart the server'
+        web.Response(text=msg)
     
     resp_txt = ''
 

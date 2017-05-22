@@ -1,6 +1,11 @@
 
-from views import index
-from views import variable_handler
+import os
+
+path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(path)
+
+from geolite.views import index
+from geolite.views import variable_handler
 
 ################################################
 
