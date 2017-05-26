@@ -3,59 +3,47 @@ import os
 import json
 import re
 import argparse
-
+from logging import warning
 from aiohttp import web
 
 path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(path)
 
 
-from geolite.gip import Gip
-from geolite.log import Log
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--dbpath", action='store', type=str)
-args = parser.parse_args()
-
-if args.dbpath:
-    print('dbpath222 == ', args.dbpath)
-    db_path = args.dbpath
-else:
-    db_path = None
+from geo_ip_service.gip import Gip
 
 #db_path = '/root/data/maxmind/GeoLite2-City.mmdb'
 
-################################################
-
-async def variable_handler(request):
-    return web.Response(
-        text="Hello, {}".format(request.match_info['ips']))
-    
-################################################
 
 async def index(request):
     """ processes request and 
         output ip info in json format """
         
-    if db_path is None:
-        msg = 'database path is not initialized. '
-        msg += 'restart the server'
-        web.Response(text=msg)
+    parser = argparse.ArgumentParser()
     
+    parser.add_argument("--action", action='store', type=str)
+    parser.add_argument("--host", action='store', type=str)
+    parser.add_argument("--port", action='store', type=str)
+    parser.add_argument("--dbpath", action='store', type=str)
+    
+    args = parser.parse_args()
+    
+    db_path = args.dbpath
+     
     resp_txt = ''
 
     query = request.query 
     
     if not 'ip' in query:
+        warning('ip is not recogized')
         return web.Response(text='')
     
-
     ip = query['ip']
     
     rx = r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}' 
     if len(re.findall(rx, ip)) == 0:
         msg = 'wrong ip'
-        Log.write(msg)
+        warning(msg)
         return web.Response(text=msg)
     
     gp = Gip(db_path)

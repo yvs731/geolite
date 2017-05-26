@@ -1,2 +1,0 @@
-# geolite
-test task
